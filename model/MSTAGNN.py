@@ -158,7 +158,7 @@ class MSTAGNN(nn.Module):
         self.encoder = Encoder(num_nodes, batch_size, periods_embedding_dim, weekend_embedding_dim, input_dim, periods,
                                weekend, embed_dim, in_steps)
         self.node_embeddings = nn.Parameter(torch.randn(num_nodes, embed_dim), requires_grad=True)
-        self.time_embeddings = nn.Parameter(torch.randn(batch_size, in_steps, embed_dim), requires_grad=True)
+        self.time_embeddings = nn.Parameter(torch.randn(64, in_steps, embed_dim), requires_grad=True)
 
         self.predictor = MSTARNN(num_nodes, num_input_dim, rnn_units, embed_dim, num_layers, in_steps, out_steps,
                                  dim_out=output_dim,
