@@ -86,11 +86,12 @@ class Inference(object):
             true_list = y_true.cpu().numpy().tolist()
             return pred_list,true_list
 
-    def diagnosis(self, idx = 0):
+    def diagnosis(self, idx = 0,duration = 500):
+        if idx+500>self.dx.shape[0]:
+            idx = 0
         self.dmodel.eval()
         with torch.no_grad():
-            pred = self.dmodel(self.dx[:20]).cpu().numpy()
+            pred = self.dmodel(self.dx[idx:idx+500]).cpu().numpy()
             pred = np.argmax(pred, axis=1).tolist()
-            true = np.argmax(self.dy[:20], axis=1).tolist()
-            print(pred,true)
+            true = np.argmax(self.dy[idx:idx+500], axis=1).tolist()
             return pred,true
