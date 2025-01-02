@@ -5,6 +5,8 @@ import torch.nn as nn
 from utils.util import init_seed
 from utils.dataloader import get_tod_dow
 from utils.norm import StandardScaler
+from sklearn.preprocessing import StandardScaler as SdS
+from model.Diagnosis import MLP
 import numpy as np
 class Inference(object):
     def __init__(self,dataset="PEMS08"):
@@ -13,6 +15,7 @@ class Inference(object):
         self.args = get_arguments(dataset=self.dataset)
         self.model = self.get_model()
         self.data,self.scaler = self.get_dataset()
+        self.dmodel,self.dx,self.dy = self.get_daignosis()
 
     def init_model(self, model):
         for p in model.parameters():
@@ -36,6 +39,24 @@ class Inference(object):
         model.load_state_dict(torch.load('./trained/{}/best_model.pth'.format(self.args.dataset)))
         return model
 
+    def get_daignosis(self):
+        # 加载故障数据集
+        data = np.load("./dataset/Diagnosis/data.npz")['data']
+        # 分离特征和标签
+        X = data[:, 1:].astype(float)
+        y = data[:, 0].astype(int)
+        # 数据标准化
+        scaler = SdS()
+        X_scaled = torch.from_numpy(scaler.fit_transform(X)).float().to(self.args.device)
+        # 将标签转换为one-hot编码
+        y_onehot = np.zeros((len(y), 7))
+        y_onehot[np.arange(len(y)), y] = 1
+        # 加载诊断模型
+        model = MLP()
+        model = model.to(self.args.device)
+        model.load_state_dict(torch.load('./trained/Diagnosis/best_model.pth'))
+        return model,X_scaled,y_onehot
+
     def get_dataset(self, periods=288):
         # load data
         data = np.load('./dataset/{}/{}.npz'.format(self.dataset, self.dataset))['data'][...,:1]
@@ -51,6 +72,8 @@ class Inference(object):
         return data,scaler
 
     def inference(self, idx = 0,horizon = 12):
+        if idx+12>=self.data.shape[1]:
+            idx = 0
         self.model.eval()
         with torch.no_grad():
             pred = self.model(self.data[:,idx:idx+horizon])
@@ -62,3 +85,12 @@ class Inference(object):
             pred_list = y_pred.cpu().numpy().tolist()
             true_list = y_true.cpu().numpy().tolist()
             return pred_list,true_list
+
+    def diagnosis(self, idx = 0):
+        self.dmodel.eval()
+        with torch.no_grad():
+            pred = self.dmodel(self.dx[:20]).cpu().numpy()
+            pred = np.argmax(pred, axis=1).tolist()
+            true = np.argmax(self.dy[:20], axis=1).tolist()
+            print(pred,true)
+            return pred,true

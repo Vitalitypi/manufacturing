@@ -23,5 +23,10 @@ def predict():
     idx = request.args.get('idx', default=None, type=int)
     y_pred,y_true = infer.inference(idx)
     return jsonify({'pred':y_pred,'true':y_true})
+@app.route('/diagnosis', methods=['GET'])
+def diagnosis():
+    idx = request.args.get('idx', default=None, type=int)
+    y_pred,y_true = infer.diagnosis(idx)
+    return jsonify({'pred':y_pred,'true':y_true})
 if __name__ == '__main__':
     app.run()
