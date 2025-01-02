@@ -18,6 +18,10 @@ def static_proxy(path):
     except Exception as e:
         print(f"Error serving {path}: {e}")
         return "File not found", 404
-
+@app.route('/predict', methods=['GET'])
+def predict():
+    idx = request.args.get('idx', default=None, type=int)
+    y_pred,y_true = infer.inference(idx)
+    return jsonify({'pred':y_pred,'true':y_true})
 if __name__ == '__main__':
     app.run()

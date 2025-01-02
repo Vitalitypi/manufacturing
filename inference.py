@@ -54,6 +54,11 @@ class Inference(object):
         self.model.eval()
         with torch.no_grad():
             pred = self.model(self.data[:,idx:idx+horizon])
-            y_pred = self.scaler.inverse_transform(pred)
-            y_true = self.scaler.inverse_transform(self.data[:,idx+horizon:idx+2*horizon])
-            return y_pred,y_true
+            true = self.data[:,idx+horizon:idx+2*horizon]
+            pred = pred[...,0].squeeze(0)
+            true = true[...,0].squeeze(0)
+            y_pred = self.scaler.inverse_transform(pred).t()
+            y_true = self.scaler.inverse_transform(true).t()
+            pred_list = y_pred.cpu().numpy().tolist()
+            true_list = y_true.cpu().numpy().tolist()
+            return pred_list,true_list
