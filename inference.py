@@ -71,7 +71,7 @@ class Inference(object):
         data = torch.from_numpy(data).unsqueeze(0).float().to(self.args.device)
         return data,scaler
 
-    def inference(self, idx = 0,horizon = 12):
+    def predict(self, idx = 0,horizon = 12):
         if idx+12>=self.data.shape[1]:
             idx = 0
         self.model.eval()
