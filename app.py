@@ -33,6 +33,7 @@ class Server(object):
                 self.predict()
                 self.IS_PREDICT = True
             elif message=="diagnosis":
+                self.diagnosis()
                 self.IS_DISGNOSIS = True
         @self.socketio.on('disconnect')
         def test_disconnect():
@@ -44,11 +45,11 @@ class Server(object):
     def predict(self):
         y_pred,y_true = self.infer.predict(self.predict_idx)
         self.predict_idx += 12
-        self.socketio.emit('predict', {'pred':y_pred,'true':y_true})
+        self.socketio.emit('predict', {'pred':y_pred,'true':y_true, 'index':self.predict_idx})
 
     def diagnosis(self):
         y_pred,y_true = self.infer.diagnosis(self.diagnosis_idx)
-        self.diagnosis_idx += 12
+        self.diagnosis_idx += 500
         self.socketio.emit('diagnosis', {'pred':y_pred,'true':y_true})
 
     def background_thread(self):
