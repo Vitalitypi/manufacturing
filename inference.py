@@ -72,8 +72,6 @@ class Inference(object):
         return data,scaler
 
     def predict(self, idx = 0,horizon = 12):
-        if idx+12>=self.data.shape[1]:
-            idx = 0
         self.model.eval()
         with torch.no_grad():
             pred = self.model(self.data[:,idx:idx+horizon])
@@ -87,8 +85,6 @@ class Inference(object):
             return pred_list,true_list
 
     def diagnosis(self, idx = 0,duration = 500):
-        if idx+500>self.dx.shape[0]:
-            idx = 0
         self.dmodel.eval()
         with torch.no_grad():
             pred = self.dmodel(self.dx[idx:idx+500]).cpu().numpy()

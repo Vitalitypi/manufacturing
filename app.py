@@ -45,11 +45,15 @@ class Server(object):
     def predict(self):
         y_pred,y_true = self.infer.predict(self.predict_idx)
         self.predict_idx += 12
+        if self.predict_idx>=self.infer.data.shape[1]:
+            self.predict_idx = 0
         self.socketio.emit('predict', {'pred':y_pred,'true':y_true, 'index':self.predict_idx})
 
     def diagnosis(self):
         y_pred,y_true = self.infer.diagnosis(self.diagnosis_idx)
         self.diagnosis_idx += 500
+        if self.diagnosis_idx>self.infer.dx.shape[0]:
+            self.diagnosis_idx = 0
         self.socketio.emit('diagnosis', {'pred':y_pred,'true':y_true})
 
     def background_thread(self):

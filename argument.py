@@ -6,7 +6,7 @@ def get_arguments(dataset,batch_size=1):
     args = argparse.ArgumentParser(description='arguments')
     args.add_argument('--dataset', default=dataset, type=str)
     args.add_argument('--mode', default='test', type=str)
-    args.add_argument('--device', default='cuda:0', type=str, help='indices of GPUs')
+    args.add_argument('--device', default='cuda:1', type=str, help='indices of GPUs')
     args.add_argument('--debug', default='False', type=eval)
     args.add_argument('--model', default='MGSTGNN', type=str)
     args.add_argument('--cuda', default=True, type=bool)
